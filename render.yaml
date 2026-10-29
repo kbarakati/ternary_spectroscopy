@@ -8,5 +8,9 @@ services:
     envVars:
       - key: HACKATHON_BUDGET
         value: "30"
+      - key: HACKATHON_CUBE_BUDGET
+        value: "900"
+      - key: CUBE_GRID_N
+        value: "15"
       - key: PYTHON_VERSION
         value: "3.12.7"

@@ -1,20 +1,9 @@
-# ATHENA Spectral API — organizer-only deployment
+# ATHENA two-challenge private API
 
-Keep this repository **private**. The Python simulator defines the hidden phase diagram, clean spectra, and noise model.
+Deploy these files to a **private** GitHub repository connected to Render. `render.yaml` configures a single Python web worker. The public participant notebook is `ATHENA_Ternary_Spectroscopy_Both_Challenges.ipynb` (distribute separately).
 
-## Deploy on Render
+API: `GET /info`; `POST /session` with `{ "challenge": 1 }` or `{ "challenge": 2 }`; `POST /pixel` with `X-Session-ID` header and `{ "wavelength":4.5,"time":1.0 }` for Challenge 1, or add `{ "x":0.3,"y":0.4 }` for Challenge 2; `GET /budget`; `POST /submit` (Challenge 1); `POST /submit-cube` (Challenge 2). `/spectrum` is disabled to enforce sparse-channel sampling.
 
-1. Put the files in this folder at the root of a private GitHub repository.
-2. In Render choose **New > Blueprint**, connect the repository, and deploy its `render.yaml`.
-3. Copy the actual public HTTPS service URL from the Render dashboard.
-4. Test `https://<your-service>.onrender.com/info`.
-5. Set `BASE_URL` in participant notebooks to your actual URL, not a placeholder.
+For Challenge 2, `GET /info` supplies ordered `cube_grid` coordinates. The submitted `predictions` matrix must have shape `(len(cube_grid), 512)`, in precisely this row order. Compositions use x>=0, y>=0, x+y<=1. Each task has its own acquisition-time budget.
 
-## Important limitations before a scored competition
-
-- `/spectrum` currently exposes a full noisy spectrum in one request, bypassing the intended point-by-point challenge; disable it for the competition.
-- `/submit` returns the RMSE immediately, enabling repeated feedback across new sessions.
-- `/session` can be called repeatedly with no participant authentication or episode limit.
-- Sessions are in process memory, so restarts lose them; use persistent storage for real competition use.
-- Add rate limiting and identity controls; this is a local prototype, not a hardened public competition backend.
-- Free-plan availability and plan constraints may vary; verify on Render before deploying.
+Important: This is a prototype and is **not production-secure for public competitive scoring**. Sessions are in volatile process memory; they have no rate limits or per-team quotas and scores are returned after submission. Add persistence, auth and a private leaderboard before scored public use. The instructor simulator is proprietary/private benchmark code: do not publish its repository or share its Python file with participants.
